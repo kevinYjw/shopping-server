@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var mongoose = require("mongoose")
 var Goods = require("../models/goods")
-var Users = require("../models/Users")
+var Users = require("../models/User")
 
 //链接数据库
 mongoose.connect("mongodb://127.0.0.1:27017/demo")
@@ -21,7 +21,7 @@ db.on("disconnected",function(){
 	console.log("MongoDB connected disconnected.")
 })
 
-router.get("/", function(req, res, next){
+router.get("/list", function(req, res, next){
 	let sort = req.param("sort")
 	let page = parseInt(req.param("page"))
 	let pageSize = parseInt(req.param("pageSize"))
@@ -115,7 +115,6 @@ router.post("/addCart",function(req,res,next){
 											msg:err2.message
 										})
 									}else{
-										console.log(doc2)
 										res.json({
 											status:'0',
 											msg:'',
