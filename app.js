@@ -22,7 +22,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(function(req,res,next){
 	if(req.cookies.userId){
-		console.log("a")
 		next()
 	}else{
 		if(req.originalUrl == '/users/login' || req.originalUrl == '/users/logout' || req.originalUrl.indexOf('/goods/list') > -1){
