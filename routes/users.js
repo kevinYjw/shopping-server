@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var User = require("../models/User")
+var Address = require('../models/Address')
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -129,7 +130,6 @@ router.post("/cartEdit",function(req,res,next){ //更改商品的数量
     "cartList.$.productNum":productNum,
     "cartList.$.checked":checked,
   },function(err,doc){
-    console.log(doc)
     if(err){
       res.json({
         status:"1",
@@ -167,6 +167,142 @@ router.post("/editCheckAll",function(req,res,next){ //全选或反选
           if(err2){
             res.json({
               status:'1',
+              msg:err.message,
+              result:''
+            })
+          } else {
+            res.json({
+              status:'0',
+              msg:'',
+              result:'suc'
+            })
+          }
+        })
+      }
+    }
+  })
+})
+
+router.get("/addressList",function(req,res,next){ //配送方式初始化
+  let userId = req.cookies.userId
+  User.findOne({'userId':userId},function(err,doc){
+    if(err){
+      res.json({
+        status:"1",
+        msg:err.message,
+        result:''
+      })
+    }else{
+      if(doc){
+        res.json({
+          status:'0',
+          msg:'',
+          result:doc.addressList
+        })
+      }
+    }
+  })
+})
+
+router.post('/setDefault',function(req,res,next){  //设置默认配送地址
+  let userId = req.cookies.userId,
+      addressId = req.body.addressId
+
+  User.findOne({"userId":userId},function(err,doc){
+    if(err){
+      res.json({
+        status:"1",
+        msg:err.message,
+        result:''
+      })
+    } else {
+      if(doc){
+        if(doc.addressList.length === 0){
+          res.json({
+            status:'2',
+            msg:'',
+            result:'未设置地址'
+          })
+        }
+        doc.addressList.forEach((item) => {
+          if(item.addressId === addressId){
+            item.isDefault = !item.isDefault
+          } else {
+            item.isDefault = false
+          }
+        })
+        doc.save(function(err2,doc2){
+          if(err2){
+            res.json({
+              status:"1",
+              msg:err.message,
+              result:''
+            })
+          } else {
+            if(doc2){
+              res.json({
+                status:'0',
+                msg:'',
+                result:'suc'
+              })
+            }
+          }
+        })
+      }
+    }
+  })
+})
+
+router.post("/delAddress",function(req,res,next){  //删除地址
+  let userId = req.cookies.userId,
+      addressId = req.body.addressId
+
+  User.update({"userId":userId},{
+    $pull:{'addressList':{"addressId":addressId}}
+  },function(err,doc){
+    if(err){
+      res.json({
+        status:"1",
+        msg:err.message,
+        result:''
+      })
+    } else {
+      if(doc){
+        res.json({
+          status:"0",
+          msg:'',
+          result:'suc'
+        })
+      }
+    }
+  })
+})
+
+router.post("/addAddress",function(req,res,next){ //添加地址
+  let userId = req.cookies.userId
+  let param = {
+    'addressId' : req.body.addressId,
+    'userName' : req.body.userName,
+    'streetName' : req.body.streetName,
+    'postCode' : req.body.postCode,
+    'tel' :req.body.tel,
+    'isDefault' : false
+  }
+
+  User.findOne({'userId':userId},function(err,doc){
+    if(err){
+      res.json({
+        status:"1",
+        msg:err.message,
+        result:''
+      })
+    } else {
+      if(doc){
+        doc.addressList.push(param)
+        doc.save(function(err2,doc2){
+          if(err2){
+            res.json({
+              status:"1",
               msg:err.message,
               result:''
             })
