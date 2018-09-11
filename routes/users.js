@@ -1,7 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var User = require("../models/User")
-var Address = require('../models/Address')
+var random = require('../util/random.js')
+var currentTime = require('../util/Date.js')
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -312,6 +313,61 @@ router.post("/addAddress",function(req,res,next){ //添加地址
               msg:'',
               result:'suc'
             })
+          }
+        })
+      }
+    }
+  })
+})
+
+router.post("/payMent",function(req,res,next){  //提交订单
+  let userId = req.cookies.userId,
+      addressId = req.body.addressId,
+      orderTotal = req.body.orderTotal,
+      goodsList = req.body.goodsList,
+      orderId = random(19),
+      createDate = currentTime(),
+      addressInfo,
+      param
+
+  User.findOne({'userId':userId},function(err,doc){
+    if(err){
+      res.json({
+        status:"1",
+        msg:err.message,
+        result:''
+      })
+    } else {
+      if(doc){
+        doc.addressList.forEach((item) => {
+          if(item.addressId === addressId){
+            addressInfo = item
+          }
+        })
+        param = {
+          'orderId' : orderId,
+          'orderTotal' : orderTotal,
+          'addressInfo' : addressInfo,
+          'goodsList' : goodsList,
+          'orderStatus' : '1',
+          'createDate' : createDate
+        }
+        doc.orderList.push(param)
+        doc.save(function(err2,doc2){
+          if(err2){
+            res.json({
+              status:"1",
+              msg:err.message,
+              result:''
+            })
+          } else {
+            if(doc2){
+              res.json({
+                status:'0',
+                msg:'',
+                result:'suc'
+              })
+            }
           }
         })
       }
