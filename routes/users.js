@@ -82,14 +82,14 @@ router.get("/cartList",function(req,res,next){ //获取购物车信息
     User.findOne({"userId":userId},function(err,doc){
       if(err){
         res.json({
-          status:"0",
+          status:"1",
           msg:err.message,
           result:''
         })
       }else{
         if(doc){
           res.json({
-            status:'1',
+            status:'0',
             msg:'',
             result:doc.cartList
           })
@@ -140,7 +140,7 @@ router.post("/cartEdit",function(req,res,next){ //更改商品的数量
     } else {
       if(doc){
         res.json({
-          status:0,
+          status:'0',
           msg:'',
           result:'suc'
         })
@@ -413,6 +413,34 @@ router.post("/orderDetail",function(req,res,next){
             }
           })
         }
+      }
+    }
+  })
+})
+
+router.get('/getCartCount',function(req,res,next){
+  let userId = req.cookies.userId
+
+  User.findOne({'userId':userId},function(err,doc){
+    if(err){
+      res.json({
+        status:'10002',
+        msg:'',
+        result:''
+      })
+    } else {
+      if(doc){
+        let cartCount = 0
+        doc.cartList.forEach((item) => {
+          cartCount += item.productNum
+        })
+        res.json({
+          status:'0',
+          msg:'',
+          result:{
+            'cartCount':cartCount
+          }
+        })
       }
     }
   })
