@@ -365,11 +365,54 @@ router.post("/payMent",function(req,res,next){  //提交订单
               res.json({
                 status:'0',
                 msg:'',
-                result:'suc'
+                result:{
+                  'orderId':orderId
+                }
               })
             }
           }
         })
+      }
+    }
+  })
+})
+
+router.post("/orderDetail",function(req,res,next){
+  let userId = req.cookies.userId,
+      orderId = req.body.orderId,
+      orderTotal = ''
+      console.log(orderTotal)
+  User.findOne({'userId':userId},function(err,doc){
+    if(err){
+      res.json({
+        status:"1",
+        msg:err.message,
+        result:''
+      })
+    } else {
+      if(doc){
+        doc.orderList.forEach((item) => {
+          if(item.orderId === orderId){
+            orderId = item.orderId
+            orderTotal = item.orderTotal
+          }
+        })
+        if(orderTotal == ''){
+          res.json({
+            status:'10002',
+            msg:'',
+            result:''
+          })
+        } else {
+          res.json({
+            status:'0',
+            msg:'',
+            result:{
+              'orderId':orderId,
+              'orderTotal':orderTotal
+            }
+          })
+        }
       }
     }
   })
