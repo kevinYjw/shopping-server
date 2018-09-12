@@ -381,7 +381,6 @@ router.post("/orderDetail",function(req,res,next){
   let userId = req.cookies.userId,
       orderId = req.body.orderId,
       orderTotal = ''
-      console.log(orderTotal)
   User.findOne({'userId':userId},function(err,doc){
     if(err){
       res.json({
@@ -444,6 +443,55 @@ router.get('/getCartCount',function(req,res,next){
       }
     }
   })
+})
+
+router.post("/register",function(req,res,next){
+  let userName = req.body.userName,
+      password = req.body.password,
+      Name = req.body.Name,
+      tel = req.body.tel,
+      postCode = req.body.postCode,
+      address = req.body.address,
+      userId = random(9),
+      addressId = random(6)
+
+      let user = new User({
+        "userId" : userId,
+        "userName" : userName,
+        "userPwd" : password,
+        "addressList" : [
+          {
+            'addressId' : addressId,
+            'userName' : Name,
+            'streetName' : address,
+            'postCode' : postCode,
+            'tel' : tel,
+            'isDefault' : true
+          }
+        ]
+      })
+
+      User.create(user,function(err,doc){
+        if(err){
+          res.json({
+            status:"1",
+            msg:err.message,
+            result:''
+          })
+        } else {
+          if(doc){
+            res.json({
+              status:'0',
+              msg:'',
+              result:{
+                'userName':userName,
+                'password':password
+              }
+            })
+          }
+        }
+      })
+
 })
 
 module.exports = router;

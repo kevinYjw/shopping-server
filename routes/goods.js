@@ -65,8 +65,8 @@ router.get("/list", function(req, res, next){
 });
 
 router.post("/addCart",function(req,res,next){
-	let productId = req.body.productId,userId="100000077"
-	Users.findOne({userId:userId},function(err,userDoc){
+	let productId = req.body.productId,userId=req.cookies.userId
+	Users.findOne({'userId':userId},function(err,userDoc){
 		if(err){
 			res.json({
 				status:"1",
